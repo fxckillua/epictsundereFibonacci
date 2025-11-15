@@ -3,10 +3,12 @@ import asyncio
 import discord
 from discord.ext import commands
 import yt_dlp
+import imageio_ffmpeg
+import os
 
 # ====================== CONFIGURAÇÕES ======================
 
-import os
+
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -43,6 +45,8 @@ FFMPEG_OPTIONS = {
     "options": "-vn",
 }
 
+FFMPEG_EXECUTABLE = imageio_ffmpeg.get_ffmpeg_exe()
+
 ytdl = yt_dlp.YoutubeDL(YTDL_OPTIONS)
 
 
@@ -66,7 +70,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data["url"] if stream else ytdl.prepare_filename(data)
 
-        source = discord.FFmpegPCMAudio(filename, **FFMPEG_OPTIONS)
+        source = discord.FFmpegPCMAudio(
+            filename,
+            executable=FFMPEG_EXECUTABLE,
+            **FFMPEG_OPTIONS,
+        )
         return cls(source, data=data)
 
 
