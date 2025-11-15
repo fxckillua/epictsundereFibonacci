@@ -6,7 +6,13 @@ import yt_dlp
 
 # ====================== CONFIGURAÇÕES ======================
 
-TOKEN = "MTQzOTA5MjQ4ODA2MDAxMDYzNg.G9WlmZ.xlLC93QKBWbsuvorxJ5vhpC_Sk8TGoVU-T6avI"
+import os
+
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if TOKEN is None:
+    print("ERRO: variável de ambiente DISCORD_TOKEN não está definida.")
+    exit(1)
 
 intents = discord.Intents.default()
 intents.message_content = True  # importante para ler comandos por texto
