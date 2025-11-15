@@ -1,14 +1,13 @@
+import os
 import asyncio
 
 import discord
 from discord.ext import commands
 import yt_dlp
 import imageio_ffmpeg
-import os
+from aiohttp import web
 
 # ====================== CONFIGURAÇÕES ======================
-
-
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -208,7 +207,34 @@ async def show_queue(ctx: commands.Context):
 
     await ctx.send(msg)
 
+# ====== Servidor web simples só para o Render detectar a porta ======
+
+async def handle_root(request):
+    return web.Response(text="Bot de música do Discord está rodando :)")
+
+async def start_web_server():
+    app = web.Application()
+    app.add_routes([web.get("/", handle_root)])
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+
+    # Render passa a porta na variável de ambiente PORT
+    port = int(os.getenv("PORT", 10000))
+
+    site = web.TCPSite(runner, host="0.0.0.0", port=port)
+    await site.start()
+    print(f"Servidor web iniciado na porta {port}")
+
 
 # ====================== INICIAR O BOT ======================
 
-bot.run(TOKEN)
+async def main():
+    # inicia o servidor web
+    await start_web_server()
+    # inicia o bot do Discord
+    await bot.start(TOKEN)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
